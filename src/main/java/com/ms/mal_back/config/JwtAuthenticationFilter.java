@@ -37,6 +37,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         log.debug("JWT filter triggered");
+
+        String path = request.getServletPath();
+        if (path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-resources")
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/auth")
+                || path.equals("/api/users/login")
+                || path.equals("/api/users/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -56,12 +69,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             user, null, user.getAuthorities());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
 
-            filterChain.doFilter(request, response); // ✅ success
+            filterChain.doFilter(request, response); // success
 
         } catch (ExpiredJwtException e) {
             sendJsonError(response, HttpStatus.UNAUTHORIZED.value(), "Token expired");
