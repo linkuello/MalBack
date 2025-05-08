@@ -41,19 +41,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(myWebsiteConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/index.html",
-                                "/webjars/**",
-                                "/swagger-resources/**",
-                                "/favicon.ico",
+                                "/", "/favicon.ico",
+                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
                                 "/auth/**",
                                 "/api/users/**",
                                 "/api/ad/**"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "OPERATOR")
+                        .requestMatchers("/api/operator/**").hasAnyRole("ADMIN", "OPERATOR")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

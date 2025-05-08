@@ -10,4 +10,5 @@ public interface ChatService {
     List<ChatResponse> getChatsForUser(Long userId);
     ChatSingularResponse getChatById(Long chatId, Long currentUserId);
     Chat getChatEntity(Long chatId);
+    ChatSingularAdminResponse getChatAsAdmin(Long chatId);
 }

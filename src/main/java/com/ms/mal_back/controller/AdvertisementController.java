@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -71,6 +72,7 @@ public class AdvertisementController {
     }
 
     @GetMapping("/my-ads")
+    @PreAuthorize("isAuthenticated()")
     public List<AdvertisementResponse> getMyAds(@RequestHeader("Authorization") String token) {
         jwtService.validateToken(token);
         Long userId = jwtService.extractUserId(token);
@@ -78,6 +80,7 @@ public class AdvertisementController {
     }
 
     @DeleteMapping("/{adId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteAd(
             @PathVariable Long adId,
             @RequestHeader("Authorization") String token) {
@@ -88,6 +91,7 @@ public class AdvertisementController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Create a new advertisement with photos")
     public ResponseEntity<AdvertisementCreatedResponse> createAd(
@@ -127,6 +131,7 @@ public class AdvertisementController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping(value = "/{adId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update an advertisement with new photos")
     public ResponseEntity<AdvertisementCreatedResponse> updateAd(

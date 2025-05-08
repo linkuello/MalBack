@@ -1,14 +1,9 @@
 package com.ms.mal_back.service.impl;
 
-import com.ms.mal_back.entity.Advertisement;
-import com.ms.mal_back.entity.Certification;
-import com.ms.mal_back.entity.Photo;
-import com.ms.mal_back.entity.User;
-import com.ms.mal_back.repository.AdvertisementRepository;
-import com.ms.mal_back.repository.CertificationRepository;
-import com.ms.mal_back.repository.PhotoRepository;
-import com.ms.mal_back.repository.UserRepository;
+import com.ms.mal_back.entity.*;
+import com.ms.mal_back.repository.*;
 import com.ms.mal_back.service.PhotoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PhotoServiceImpl implements PhotoService {
     @Value("${photo.upload-dir}")
     private String uploadDir;
@@ -33,14 +29,7 @@ public class PhotoServiceImpl implements PhotoService {
     private final UserRepository userRepo;
     private final CertificationRepository certRepo;
     private final AdvertisementRepository adRepo;
-
-    public PhotoServiceImpl(PhotoRepository photoRepo, UserRepository userRepo,
-                            CertificationRepository certRepo, AdvertisementRepository adRepo) {
-        this.photoRepo = photoRepo;
-        this.userRepo = userRepo;
-        this.certRepo = certRepo;
-        this.adRepo = adRepo;
-    }
+    private final PaymentReceiptRepository paymentReceiptRepo;
 
     private void validateFile(MultipartFile file) {
         if (file.getSize() > 5 * 1024 * 1024) {
@@ -135,5 +124,16 @@ public class PhotoServiceImpl implements PhotoService {
         adRepo.save(ad);
     }
 
+    @Override
+    public void saveReceiptPhoto(PaymentReceipt receipt, MultipartFile file) {
+        if (receipt.getReceiptPhoto() != null) {
+            deletePhoto(receipt.getReceiptPhoto());
+        }
+
+        Photo newPhoto = savePhotoToDisk(file);
+        newPhoto.setPaymentReceipt(receipt);
+        receipt.setReceiptPhoto(photoRepo.save(newPhoto));
+        paymentReceiptRepo.save(receipt);
+    }
 
 }

@@ -31,6 +31,10 @@ public class Photo {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_receipt_id")
+    private PaymentReceipt paymentReceipt;
 }
 
 

@@ -6,6 +6,7 @@ import com.ms.mal_back.dto.AdvertisementResponse;
 import com.ms.mal_back.dto.AdvertisementSingularResponse;
 import com.ms.mal_back.entity.Advertisement;
 import com.ms.mal_back.entity.User;
+import com.ms.mal_back.entity.enums.Priority;
 import com.ms.mal_back.mapper.AdvertisementMapper;
 import com.ms.mal_back.repository.AdvertisementRepository;
 import com.ms.mal_back.repository.UserRepository;
@@ -13,9 +14,11 @@ import com.ms.mal_back.service.AdvertisementService;
 import com.ms.mal_back.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +37,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement ad = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Advertisement not found"));
         boolean isFavorite = favoriteService.isFavorite(currentUserId, ad.getId());
+        ad.setViewCount(ad.getViewCount()+1);
         return advertisementMapper.toDto(ad,isFavorite);
     }
 
@@ -120,5 +124,19 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (ad.getSeller().getId().equals(currentUserId)){
             advertisementRepository.delete(ad);
         }
+    }
+
+    @Scheduled(cron = "0 0 3 * * *") // Every day at 03:00
+    public void resetExpiredPriorities() {
+        LocalDate today = LocalDate.now();
+        List<Advertisement> expiredAds = advertisementRepository
+                .findByPriorityNotAndPriorityUntilBefore(Priority.STANDARD, today);
+
+        for (Advertisement ad : expiredAds) {
+            ad.setPriority(Priority.STANDARD);
+            ad.setPriorityUntil(null);
+        }
+
+        advertisementRepository.saveAll(expiredAds);
     }
 }

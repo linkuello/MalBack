@@ -2,10 +2,12 @@ package com.ms.mal_back.repository;
 
 import com.ms.mal_back.entity.Advertisement;
 import com.ms.mal_back.entity.User;
+import com.ms.mal_back.entity.enums.Priority;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -20,4 +22,5 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
     @Query("SELECT DISTINCT a.breed FROM Advertisement a WHERE a.animal = ?1")
     List<String> findDistinctBreedsByAnimal(String animal);
 
+    List<Advertisement> findByPriorityNotAndPriorityUntilBefore(Priority priority, LocalDate date);
 }

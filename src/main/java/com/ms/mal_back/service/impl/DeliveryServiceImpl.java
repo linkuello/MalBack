@@ -7,6 +7,7 @@ import com.ms.mal_back.dto.DeliveryStatusResponse;
 import com.ms.mal_back.entity.Advertisement;
 import com.ms.mal_back.entity.Delivery;
 import com.ms.mal_back.entity.enums.DeliveryStatus;
+import com.ms.mal_back.exception.ConflictException;
 import com.ms.mal_back.mapper.DeliveryMapper;
 import com.ms.mal_back.repository.AdvertisementRepository;
 import com.ms.mal_back.repository.DeliveryRepository;
@@ -57,6 +58,11 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new EntityNotFoundException("Ad not found"));
         Long sellerId = ad.getSeller().getId();
 
+        long count = deliveryRepository.countByBuyerIdAndAdId(buyerId, request.getAdId());
+        if (count >= 10) {
+            throw new ConflictException("You have exceeded the delivery request limit for this ad.");
+        }
+
         Delivery delivery = deliveryMapper.toEntityFromCustomer(request, buyerId, sellerId);
         delivery.setBuyerName(userRepository.getById(buyerId).getUsername());
         deliveryRepository.save(delivery);
@@ -95,11 +101,17 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     public List<DeliveryOperatorResponse> getDeliveriesForOperator() {
-        List<Delivery> deliveries = deliveryRepository.findByStatus(DeliveryStatus.READY);
+        List<Delivery> deliveries = deliveryRepository.findAll();
         Set<Long> adIds = deliveries.stream().map(Delivery::getAdId).collect(Collectors.toSet());
         Map<Long, Advertisement> adMap = advertisementRepository.findAllById(adIds)
                 .stream().collect(Collectors.toMap(Advertisement::getId, Function.identity()));
         return deliveryMapper.toOperatorResponses(deliveries, adMap);
+    }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        List<Delivery> deliveries = deliveryRepository.findAllByBuyerIdOrSellerId(userId, userId);
+        deliveryRepository.deleteAll(deliveries);
     }
 
     @Scheduled(cron = "0 0 3 * * *")

@@ -43,6 +43,23 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
+    public List<AdminUserOverview> toAdminDtos(List<User> users) {
+        return users.stream()
+                .map(this::toAdminDto)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public AdminUserOverview toAdminDto (User user) {
+        AdminUserOverview adminUserOverview = new AdminUserOverview();
+        adminUserOverview.setId(user.getId());
+        adminUserOverview.setUsername(user.getUsername());
+        adminUserOverview.setPhone(user.getPhone());
+        adminUserOverview.setEmail(user.getEmail());
+        adminUserOverview.setEnabled(user.isEnabled());
+        return adminUserOverview;
+    }
+
+    @Override
     public List<UserEditFormResponse> toDtoS(List<User> users) {
         return users.stream()
                 .map(this::toEditFormDto)

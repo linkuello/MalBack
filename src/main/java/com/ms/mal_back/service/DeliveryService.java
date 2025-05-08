@@ -16,4 +16,5 @@ public interface DeliveryService {
     public void sellerConfirm(DeliveryRequestBySeller dto, Long sellerId) ;
     public void operatorUpdateStatus(Long id, DeliveryStatus status) ;
     public List<DeliveryOperatorResponse> getDeliveriesForOperator();
+    public void deleteAllByUserId(Long userId);
 }

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @Component
 public class DeliveryMapperImpl implements DeliveryMapper {
 
+    @Override
     public Delivery toEntityFromCustomer(DeliveryRequestByCustomer dto, Long buyerId, Long sellerId) {
         Delivery delivery = new Delivery();
         delivery.setAdId(dto.getAdId());
@@ -28,12 +29,14 @@ public class DeliveryMapperImpl implements DeliveryMapper {
         return delivery;
     }
 
+    @Override
     public void applySellerResponse(Delivery delivery, DeliveryRequestBySeller dto) {
         delivery.setSellerPhone(dto.getPhone());
         delivery.setSellerAddress(dto.getAddress());
         delivery.setStatus(DeliveryStatus.READY);
     }
 
+    @Override
     public List<DeliveryStatusResponse> toStatusResponsesForSeller(List<Delivery> deliveries, Map<Long, Advertisement> adMap) {
         return deliveries.stream()
                 .map(d -> {
@@ -49,6 +52,7 @@ public class DeliveryMapperImpl implements DeliveryMapper {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<DeliveryStatusResponse> toStatusResponsesForBuyer(List<Delivery> deliveries, Map<Long, Advertisement> adMap) {
         return deliveries.stream()
                 .map(d -> {
@@ -64,6 +68,7 @@ public class DeliveryMapperImpl implements DeliveryMapper {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<DeliveryOperatorResponse> toOperatorResponses(List<Delivery> deliveries, Map<Long, Advertisement> adMap) {
         return deliveries.stream()
                 .map(d -> {

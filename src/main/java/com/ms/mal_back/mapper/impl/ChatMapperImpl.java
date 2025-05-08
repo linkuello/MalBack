@@ -2,7 +2,9 @@ package com.ms.mal_back.mapper.impl;
 
 import com.ms.mal_back.config.UrlBuilder;
 import com.ms.mal_back.dto.ChatResponse;
+import com.ms.mal_back.dto.ChatSingularAdminResponse;
 import com.ms.mal_back.dto.ChatSingularResponse;
+import com.ms.mal_back.dto.MessageResponse;
 import com.ms.mal_back.entity.Advertisement;
 import com.ms.mal_back.entity.Chat;
 import com.ms.mal_back.entity.User;
@@ -81,6 +83,43 @@ public class ChatMapperImpl implements ChatMapper {
                 messageService.getAllMessagesDto(chat, currentUserId)
         );
     }
+    @Override
+    public ChatSingularAdminResponse toAdminResponse(Chat chat) {
+        Advertisement ad = chat.getAdvertisement();
+        String firstPhoto = ad.getPhotos().isEmpty() ? null :
+                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getFilePath());
+
+        ChatSingularAdminResponse.UserPreview seller = new ChatSingularAdminResponse.UserPreview(
+                chat.getSeller().getId(),
+                chat.getSeller().getUsername(),
+                chat.getSeller().getPhoto() != null
+                        ? urlBuilder.buildFullPhotoUrl(chat.getSeller().getPhoto().getFilePath())
+                        : null
+        );
+
+        ChatSingularAdminResponse.UserPreview customer = new ChatSingularAdminResponse.UserPreview(
+                chat.getCustomer().getId(),
+                chat.getCustomer().getUsername(),
+                chat.getCustomer().getPhoto() != null
+                        ? urlBuilder.buildFullPhotoUrl(chat.getCustomer().getPhoto().getFilePath())
+                        : null
+        );
+
+        List<MessageResponse> messages = messageService.getAllMessagesDto(chat, null); // null: admin = no filter
+
+        return new ChatSingularAdminResponse(
+                chat.getId(),
+                ad.getId(),
+                ad.getAnimal(),
+                ad.getBreed(),
+                ad.getPrice(),
+                firstPhoto,
+                seller,
+                customer,
+                messages
+        );
+    }
+
 }
 
 

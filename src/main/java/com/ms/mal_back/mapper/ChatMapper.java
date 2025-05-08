@@ -1,6 +1,7 @@
 package com.ms.mal_back.mapper;
 
 import com.ms.mal_back.dto.ChatResponse;
+import com.ms.mal_back.dto.ChatSingularAdminResponse;
 import com.ms.mal_back.dto.ChatSingularResponse;
 import com.ms.mal_back.entity.Advertisement;
 import com.ms.mal_back.entity.Chat;
@@ -14,5 +15,5 @@ public interface ChatMapper {
     ChatResponse toChatResponse(Chat chat);
     List<ChatResponse> toChatResponseList(List<Chat> chats);
     ChatSingularResponse toSingularResponse(Chat chat, Long currentUserId);
+    public ChatSingularAdminResponse toAdminResponse(Chat chat);
 }
-

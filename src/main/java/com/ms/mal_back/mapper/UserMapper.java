@@ -11,4 +11,6 @@ public interface UserMapper {
     List<UserEditFormResponse> toDtoS(List<User> users);
     User toEntity(UserRequest userRequest);
     public User updateEntity(User user, UserEditFormRequest request);
+    public List<AdminUserOverview> toAdminDtos(List<User> users);
+    public AdminUserOverview toAdminDto (User user);
 }

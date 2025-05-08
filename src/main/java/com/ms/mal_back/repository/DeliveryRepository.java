@@ -18,5 +18,9 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     List<Delivery> findByStatus(DeliveryStatus status);
 
     void deleteByCreatedAtBefore(LocalDateTime cutoff);
+
+    long countByBuyerIdAndAdId(Long buyerId, Long adId);
+
+    List<Delivery> findAllByBuyerIdOrSellerId(Long userId, Long userId1);
 }
 

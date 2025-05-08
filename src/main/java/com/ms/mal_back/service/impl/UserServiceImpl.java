@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
 
     @Override
-    public List<UserEditFormResponse> getAll() {
-        return userMapper.toDtoS(userRepository.findAll());
+    public List<AdminUserOverview> getAll() {
+        return userMapper.toAdminDtos(userRepository.findAll());
     }
 
     @Override
@@ -143,5 +143,25 @@ public class UserServiceImpl implements UserService {
     public User getUserEntity(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    @Override
+    public void requestPasswordReset(String email) {
+        userRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalArgumentException("No user registered with that email"));
+
+        String token = jwtService.generatePasswordResetToken(email);
+        emailService.sendPasswordResetLink(email, token);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        String email = jwtService.extractEmailFromConfirmationToken(token);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -36,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("JWT filter triggered");
 
         String path = request.getServletPath();
         if (path.startsWith("/swagger-ui")
@@ -53,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response); // skip if no auth
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -66,14 +67,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 User user = userRepository.findById(userId).orElse(null);
 
                 if (user != null && jwtService.isTokenValid(token)) {
+                    List<String> roles = jwtService.extractRoles(token);
+                    List<SimpleGrantedAuthority> authorities = roles.stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                            .toList();
+
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            user, null, user.getAuthorities());
+                            user, null, authorities);
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
 
-            filterChain.doFilter(request, response); // success
+            filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
             sendJsonError(response, HttpStatus.UNAUTHORIZED.value(), "Token expired");
@@ -81,6 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             sendJsonError(response, HttpStatus.UNAUTHORIZED.value(), "Invalid token");
         }
     }
+
 
     private void sendJsonError(HttpServletResponse response, int status, String message) throws IOException {
         response.setStatus(status);

@@ -65,6 +65,13 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public ChatSingularAdminResponse getChatAsAdmin(Long chatId){
+        Chat chat = chatRepository.findByIdWithMessages(chatId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found"));
+        return chatMapper.toAdminResponse(chat);
+    }
+
+    @Override
     public ChatSingularResponse getChatById(Long chatId, Long currentUserId) {
         Chat chat = chatRepository.findByIdWithMessages(chatId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found"));

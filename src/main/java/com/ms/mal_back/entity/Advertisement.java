@@ -67,5 +67,6 @@ public class Advertisement {
         this.lastModifiedAt = LocalDate.now();
     }
 
+    private LocalDate priorityUntil;
 }
 
