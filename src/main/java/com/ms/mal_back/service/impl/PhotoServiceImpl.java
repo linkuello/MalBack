@@ -36,8 +36,8 @@ public class PhotoServiceImpl implements PhotoService {
             throw new IllegalArgumentException("Max file size is 5MB");
         }
         String type = file.getContentType();
-        if (!List.of("image/jpeg", "image/png").contains(type)) {
-            throw new IllegalArgumentException("Only JPG and PNG files are allowed");
+        if (!List.of("image/jpeg", "image/png", "image/pdf").contains(type)) {
+            throw new IllegalArgumentException("Only JPG , PDF and PNG files are allowed");
         }
     }
 
