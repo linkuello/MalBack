@@ -1,7 +1,6 @@
 package com.ms.mal_back.controller;
 
 import com.ms.mal_back.dto.ChatCreatedResponse;
-import com.ms.mal_back.dto.ChatRequest;
 import com.ms.mal_back.dto.ChatResponse;
 import com.ms.mal_back.dto.ChatSingularResponse;
 import com.ms.mal_back.service.ChatService;
@@ -24,14 +23,14 @@ public class ChatController {
     private final JwtService jwtService;
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/create")
+    @PostMapping("/create/")
     public ResponseEntity<ChatCreatedResponse> createChat(
             @RequestHeader("Authorization") String token,
-            @RequestBody ChatRequest request
+            @RequestParam Long id
     ) {
         jwtService.validateToken(token);
         Long userId = jwtService.extractUserId(token);
-        return ResponseEntity.ok(chatService.createChat(userId, request));
+        return ResponseEntity.ok(chatService.createChat(userId, id));
     }
 
     @PreAuthorize("isAuthenticated()")

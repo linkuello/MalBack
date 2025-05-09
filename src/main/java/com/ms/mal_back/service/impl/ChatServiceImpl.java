@@ -29,11 +29,11 @@ public class ChatServiceImpl implements ChatService {
     private final ChatMapper chatMapper;
 
     @Override
-    public ChatCreatedResponse createChat(Long customerId, ChatRequest request) {
+    public ChatCreatedResponse createChat(Long customerId, Long adId) {
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        Advertisement ad = advertisementRepository.findById(request.getAdvertisementId())
+        Advertisement ad = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Advertisement not found"));
 
         User seller = ad.getSeller();

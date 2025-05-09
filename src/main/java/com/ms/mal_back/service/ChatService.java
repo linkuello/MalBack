@@ -6,7 +6,7 @@ import com.ms.mal_back.entity.Chat;
 import java.util.List;
 
 public interface ChatService {
-    ChatCreatedResponse createChat(Long customerId, ChatRequest request);
+    ChatCreatedResponse createChat(Long customerId, Long adId);
     List<ChatResponse> getChatsForUser(Long userId);
     ChatSingularResponse getChatById(Long chatId, Long currentUserId);
     Chat getChatEntity(Long chatId);
