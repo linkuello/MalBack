@@ -28,6 +28,7 @@ public class AdvertisementSingularResponse {
     private boolean isFavorite;
     private List<String> photoUrls;
     private SellerResponse seller;
+    private boolean isOwner;
 
     @Getter
     @Setter

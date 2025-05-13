@@ -50,7 +50,7 @@ public class AdvertisementMapperImpl implements AdvertisementMapper {
     }
 
     @Override
-    public AdvertisementSingularResponse toDto(Advertisement ad,boolean isFavorite) {
+    public AdvertisementSingularResponse toDto(Advertisement ad, boolean isFavorite, boolean isOwner) {
         List<String> photoUrls = ad.getPhotos().stream()
                 .map(Photo::getFilePath)
                 .map(urlBuilder::buildFullPhotoUrl)
@@ -72,7 +72,8 @@ public class AdvertisementMapperImpl implements AdvertisementMapper {
                 ad.getLastModifiedAt(),
                 isFavorite,
                 photoUrls,
-                seller
+                seller,
+                isOwner
         );
     }
 

@@ -11,7 +11,7 @@ import java.util.List;
 public interface AdvertisementMapper {
     public Advertisement toEntity(AdvertisementRequest request, User seller);
     public Advertisement updateEntity(Advertisement ad, AdvertisementRequest request);
-    public AdvertisementSingularResponse toDto(Advertisement ad,boolean isFavorite);
+    public AdvertisementSingularResponse toDto(Advertisement ad, boolean isFavorite, boolean isOwner);
     public AdvertisementResponse toSimpleDto(Advertisement ad);
     public List<AdvertisementResponse> toSimpleDtoList(List<Advertisement> ads);
 }

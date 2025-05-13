@@ -33,7 +33,7 @@ public class FavoriteController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{adId}")
+    @DeleteMapping("/remove/{adId}")
     public ResponseEntity<Void> removeFavorite(
             @RequestHeader("Authorization") String token,
             @PathVariable Long adId

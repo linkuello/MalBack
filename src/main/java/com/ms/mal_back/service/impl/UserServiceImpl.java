@@ -56,6 +56,9 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalStateException("Email already in use");
         }
+        if (!request.getPassword().matches("^[A-Za-z\\d!?*()]{8,20}$")) {
+            throw new IllegalArgumentException("Password does not meet security requirements.");
+        }
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RuntimeException("Role not found")));
@@ -63,7 +66,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         String token = jwtService.generateEmailConfirmationToken(user.getEmail());
-        String confirmLink = "https://ваш-домен/api/users/confirm-email/" + token;
+        String confirmLink = "https:/localhost:5137/login/confirm/" + token;
         String text = "Здравствуйте, %s!\n\nПожалуйста, подтвердите email по ссылке:\n%s";
         emailService.sendEmail(user.getEmail(), "Подтверждение регистрации", String.format(text, user.getUsername(), confirmLink));
     }
@@ -156,6 +159,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetPassword(String token, String newPassword) {
+        if (!newPassword.matches("^[A-Za-z\\d!?*()]{8,20}$")) {
+            throw new IllegalArgumentException("Password does not meet security requirements.");
+        }
         String email = jwtService.extractEmailFromConfirmationToken(token);
 
         User user = userRepository.findByEmail(email)

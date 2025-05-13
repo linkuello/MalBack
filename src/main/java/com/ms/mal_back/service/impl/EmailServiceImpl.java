@@ -1,7 +1,6 @@
 package com.ms.mal_back.service.impl;
 
 import com.ms.mal_back.config.JwtService;
-import com.ms.mal_back.entity.User;
 import com.ms.mal_back.repository.UserRepository;
 import com.ms.mal_back.service.EmailService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class EmailServiceImpl implements EmailService {
         String subject = "MalSat.kg - Password Reset";
         String body = "To reset your password, click the link below:\n\n" +
                 link + "\n\nThis link will expire in 15 minutes.";
-
         sendEmail(email, subject, body);
     }
 }

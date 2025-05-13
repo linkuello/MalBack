@@ -33,12 +33,16 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private final FavoriteService favoriteService;
 
     @Override
-    public AdvertisementSingularResponse getAdvertisementById(Long adId,Long currentUserId) {
+    public AdvertisementSingularResponse getAdvertisementById(Long adId, Long currentUserId) {
         Advertisement ad = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Advertisement not found"));
+
         boolean isFavorite = favoriteService.isFavorite(currentUserId, ad.getId());
-        ad.setViewCount(ad.getViewCount()+1);
-        return advertisementMapper.toDto(ad,isFavorite);
+        boolean isOwn = currentUserId != null && currentUserId.equals(ad.getSeller().getId());
+
+        ad.setViewCount(ad.getViewCount() + 1);
+
+        return advertisementMapper.toDto(ad, isFavorite, isOwn);
     }
 
     @Override
