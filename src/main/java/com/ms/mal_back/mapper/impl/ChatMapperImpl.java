@@ -38,7 +38,7 @@ public class ChatMapperImpl implements ChatMapper {
     public ChatResponse toChatResponse(Chat chat) {
         Advertisement ad = chat.getAdvertisement();
         String firstPhoto = ad.getPhotos().isEmpty() ? null :
-                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getFilePath());
+                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getId());
 
         return new ChatResponse(
                 chat.getId(),
@@ -60,7 +60,7 @@ public class ChatMapperImpl implements ChatMapper {
     public ChatSingularResponse toSingularResponse(Chat chat, Long currentUserId) {
         Advertisement ad = chat.getAdvertisement();
         String firstPhoto = ad.getPhotos().isEmpty() ? null :
-                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getFilePath());
+                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getId());
 
         User other = chat.getSeller().getId().equals(currentUserId)
                 ? chat.getCustomer()
@@ -69,7 +69,7 @@ public class ChatMapperImpl implements ChatMapper {
         ChatSingularResponse.UserPreview otherUser = new ChatSingularResponse.UserPreview(
                 other.getId(),
                 other.getUsername(),
-                other.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(other.getPhoto().getFilePath()) : null
+                other.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(other.getPhoto().getId()) : null
         );
 
         return new ChatSingularResponse(
@@ -87,13 +87,13 @@ public class ChatMapperImpl implements ChatMapper {
     public ChatSingularAdminResponse toAdminResponse(Chat chat) {
         Advertisement ad = chat.getAdvertisement();
         String firstPhoto = ad.getPhotos().isEmpty() ? null :
-                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getFilePath());
+                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getId());
 
         ChatSingularAdminResponse.UserPreview seller = new ChatSingularAdminResponse.UserPreview(
                 chat.getSeller().getId(),
                 chat.getSeller().getUsername(),
                 chat.getSeller().getPhoto() != null
-                        ? urlBuilder.buildFullPhotoUrl(chat.getSeller().getPhoto().getFilePath())
+                        ? urlBuilder.buildFullPhotoUrl(chat.getSeller().getPhoto().getId())
                         : null
         );
 
@@ -101,7 +101,7 @@ public class ChatMapperImpl implements ChatMapper {
                 chat.getCustomer().getId(),
                 chat.getCustomer().getUsername(),
                 chat.getCustomer().getPhoto() != null
-                        ? urlBuilder.buildFullPhotoUrl(chat.getCustomer().getPhoto().getFilePath())
+                        ? urlBuilder.buildFullPhotoUrl(chat.getCustomer().getPhoto().getId())
                         : null
         );
 

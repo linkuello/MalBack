@@ -6,14 +6,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Component
 public class UrlBuilder {
 
-    public String buildFullPhotoUrl(String filePath) {
-        if (filePath == null || filePath.isBlank()) return null;
+    public String buildFullPhotoUrl(Long photoId) {
+        if (photoId == null) return null;
 
         String baseUrl = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .build()
-                .toUriString(); // https://your-backend.com
+                .toUriString(); // e.g., https://your-backend.com
 
-        return baseUrl + filePath; // → https://your-backend.com/photos/abc.jpg
+        return baseUrl + "/photos/" + photoId; // e.g., https://your-backend.com/photos/42
     }
 }

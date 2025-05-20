@@ -24,7 +24,7 @@ public class UserMapperImpl implements UserMapper {
         response.setId(user.getId());
         response.setUsername(user.getUsername());
         response.setPhone(user.getPhone());
-        response.setPhotoUrl(user.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(user.getPhoto().getFilePath()) : null);
+        response.setPhotoUrl(user.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(user.getPhoto().getId()) : null);
         response.setEmail(user.getEmail());
         response.setAdvertisements(user.getAdvertisements().stream()
                 .map(advertisementMapper::toSimpleDto)
@@ -39,7 +39,7 @@ public class UserMapperImpl implements UserMapper {
         response.setUsername(user.getUsername());
         response.setPhone(user.getPhone());
         response.setEmail(user.getEmail());
-        response.setPhotoUrl(user.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(user.getPhoto().getFilePath()) : null);
+        response.setPhotoUrl(user.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(user.getPhoto().getId()) : null);
         return response;
     }
 

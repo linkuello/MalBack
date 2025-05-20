@@ -30,7 +30,7 @@ public class CertificationMapperImpl implements CertificationMapper {
     @Override
     public CertificationResponse toDto(Certification cert) {
         String photoUrl = cert.getPhoto() != null
-                ? urlBuilder.buildFullPhotoUrl(cert.getPhoto().getFilePath())
+                ? urlBuilder.buildFullPhotoUrl(cert.getPhoto().getId())
                 : null;
 
         return new CertificationResponse(

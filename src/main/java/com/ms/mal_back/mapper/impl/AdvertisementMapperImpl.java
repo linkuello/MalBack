@@ -8,7 +8,6 @@ import com.ms.mal_back.entity.*;
 import com.ms.mal_back.entity.enums.Priority;
 import com.ms.mal_back.entity.enums.Region;
 import com.ms.mal_back.mapper.AdvertisementMapper;
-import com.ms.mal_back.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +51,7 @@ public class AdvertisementMapperImpl implements AdvertisementMapper {
     @Override
     public AdvertisementSingularResponse toDto(Advertisement ad, boolean isFavorite, boolean isOwner) {
         List<String> photoUrls = ad.getPhotos().stream()
-                .map(Photo::getFilePath)
+                .map(Photo::getId)
                 .map(urlBuilder::buildFullPhotoUrl)
                 .toList();
 
@@ -77,11 +76,10 @@ public class AdvertisementMapperImpl implements AdvertisementMapper {
         );
     }
 
-
     @Override
     public AdvertisementResponse toSimpleDto(Advertisement ad) {
         String firstPhoto = ad.getPhotos().isEmpty() ? null :
-                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getFilePath());
+                urlBuilder.buildFullPhotoUrl(ad.getPhotos().get(0).getId());
 
         return new AdvertisementResponse(
                 ad.getId(),
@@ -102,11 +100,15 @@ public class AdvertisementMapperImpl implements AdvertisementMapper {
     }
 
     public AdvertisementSingularResponse.SellerResponse toSellerResponse(User user) {
+        String photoUrl = user.getPhoto() != null
+                ? urlBuilder.buildFullPhotoUrl(user.getPhoto().getId())
+                : null;
+
         return new AdvertisementSingularResponse.SellerResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getPhone(),
-                user.getPhoto() != null ? urlBuilder.buildFullPhotoUrl(user.getPhoto().getFilePath()) : null
+                photoUrl
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.ms.mal_back.mapper.impl;
 
+import com.ms.mal_back.config.UrlBuilder;
 import com.ms.mal_back.dto.PaymentReceiptOperatorResponse;
 import com.ms.mal_back.dto.UpgradeReceiptRequest;
 import com.ms.mal_back.entity.Advertisement;
@@ -8,13 +9,17 @@ import com.ms.mal_back.entity.User;
 import com.ms.mal_back.entity.enums.Priority;
 import com.ms.mal_back.entity.enums.ReceiptStatus;
 import com.ms.mal_back.mapper.PaymentReceiptMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class PaymentReceiptMapperImpl implements PaymentReceiptMapper {
+
+    private final UrlBuilder urlBuilder;
 
     @Override
     public PaymentReceipt toEntity(User user, Advertisement ad, UpgradeReceiptRequest dto) {
@@ -41,8 +46,9 @@ public class PaymentReceiptMapperImpl implements PaymentReceiptMapper {
             setStatus(receipt.getStatus());
             setSubmittedAt(receipt.getSubmittedAt());
 
+            // ✅ Fixed: use URL builder instead of file path
             String photoUrl = receipt.getReceiptPhoto() != null
-                    ? receipt.getReceiptPhoto().getFilePath()
+                    ? urlBuilder.buildFullPhotoUrl(receipt.getReceiptPhoto().getId())
                     : null;
             setReceiptPhotoUrl(photoUrl);
         }};

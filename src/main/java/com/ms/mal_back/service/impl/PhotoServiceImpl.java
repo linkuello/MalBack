@@ -4,26 +4,18 @@ import com.ms.mal_back.entity.*;
 import com.ms.mal_back.repository.*;
 import com.ms.mal_back.service.PhotoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PhotoServiceImpl implements PhotoService {
-    @Value("${photo.upload-dir}")
-    private String uploadDir;
 
     private final PhotoRepository photoRepo;
     private final UserRepository userRepo;
@@ -37,37 +29,28 @@ public class PhotoServiceImpl implements PhotoService {
         }
         String type = file.getContentType();
         if (!List.of("image/jpeg", "image/png", "image/pdf").contains(type)) {
-            throw new IllegalArgumentException("Only JPG , PDF and PNG files are allowed");
+            throw new IllegalArgumentException("Only JPG, PNG, and PDF files are allowed");
         }
     }
 
-    private Photo savePhotoToDisk(MultipartFile file) {
+    private Photo savePhotoToDatabase(MultipartFile file) {
         validateFile(file);
         try {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path savePath = Paths.get(uploadDir, fileName);
-            Files.copy(file.getInputStream(), savePath, StandardCopyOption.REPLACE_EXISTING);
-
             Photo photo = new Photo();
-            photo.setFileName(fileName);
-            photo.setFilePath("/photos/" + fileName);
+            photo.setFileName(UUID.randomUUID() + "_" + file.getOriginalFilename());
             photo.setMimeType(file.getContentType());
             photo.setUploadTime(LocalDateTime.now());
-
+            photo.setData(file.getBytes());
             return photo;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save photo", e);
+            throw new RuntimeException("Failed to save photo to database", e);
         }
     }
 
     private void deletePhoto(Photo photo) {
-        if (photo == null) return;
-        try {
-            Files.deleteIfExists(Paths.get(uploadDir, Paths.get(photo.getFilePath()).getFileName().toString()));
-        } catch (IOException e) {
-            // Optional: log error
+        if (photo != null) {
+            photoRepo.delete(photo);
         }
-        photoRepo.delete(photo);
     }
 
     @Override
@@ -75,7 +58,7 @@ public class PhotoServiceImpl implements PhotoService {
         if (user.getPhoto() != null) {
             deletePhoto(user.getPhoto());
         }
-        Photo newPhoto = savePhotoToDisk(file);
+        Photo newPhoto = savePhotoToDatabase(file);
         newPhoto.setUser(user);
         user.setPhoto(photoRepo.save(newPhoto));
         userRepo.save(user);
@@ -86,7 +69,7 @@ public class PhotoServiceImpl implements PhotoService {
         if (cert.getPhoto() != null) {
             deletePhoto(cert.getPhoto());
         }
-        Photo newPhoto = savePhotoToDisk(file);
+        Photo newPhoto = savePhotoToDatabase(file);
         newPhoto.setCertification(cert);
         cert.setPhoto(photoRepo.save(newPhoto));
         certRepo.save(cert);
@@ -98,24 +81,25 @@ public class PhotoServiceImpl implements PhotoService {
 
         if (existingPhotos != null && !existingPhotos.isEmpty()) {
             for (Photo photo : new ArrayList<>(existingPhotos)) {
-                deletePhoto(photo); // delete file from disk if needed
+                deletePhoto(photo);
             }
-            existingPhotos.clear(); // 🔥 keep same collection instance
+            existingPhotos.clear(); // keep reference to the same list
         }
 
         for (MultipartFile file : files) {
-            Photo photo = savePhotoToDisk(file);
+            Photo photo = savePhotoToDatabase(file);
             photo.setAdvertisement(ad);
             photoRepo.save(photo);
-            existingPhotos.add(photo); // ✅ use existing ad.getPhotos()
+            existingPhotos.add(photo);
         }
 
-        adRepo.save(ad); // optional, depends on your cascade setup
+        adRepo.save(ad); // ensure changes are persisted
     }
 
+    @Override
     public void appendAdPhotos(Advertisement ad, List<MultipartFile> files) {
         for (MultipartFile file : files) {
-            Photo photo = savePhotoToDisk(file);
+            Photo photo = savePhotoToDatabase(file);
             photo.setAdvertisement(ad);
             photoRepo.save(photo);
             ad.getPhotos().add(photo);
@@ -130,10 +114,9 @@ public class PhotoServiceImpl implements PhotoService {
             deletePhoto(receipt.getReceiptPhoto());
         }
 
-        Photo newPhoto = savePhotoToDisk(file);
+        Photo newPhoto = savePhotoToDatabase(file);
         newPhoto.setPaymentReceipt(receipt);
         receipt.setReceiptPhoto(photoRepo.save(newPhoto));
         paymentReceiptRepo.save(receipt);
     }
-
 }
