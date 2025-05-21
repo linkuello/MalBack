@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         String token = jwtService.generateEmailConfirmationToken(user.getEmail());
-        String confirmLink = "https:/localhost:5137/login/confirm/" + token;
+        String confirmLink = "https://malsat.onrender.com/login/confirm/" + token;
         String text = "Здравствуйте, %s!\n\nПожалуйста, подтвердите email по ссылке:\n%s";
         emailService.sendEmail(user.getEmail(), "Подтверждение регистрации", String.format(text, user.getUsername(), confirmLink));
     }
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
             user.setEnabled(false);
 
             String newToken = jwtService.generateEmailConfirmationToken(user.getEmail());
-            String confirmLink = "https://ваш-домен/api/users/confirm-email/" + newToken;
+            String confirmLink = "https://malsat.onrender.com/api/users/confirm-email/" + newToken;
             String text = "Здравствуйте, %s!\n\nПожалуйста, подтвердите email по ссылке:\n%s";
             emailService.sendEmail(user.getEmail(), "Подтверждение регистрации", String.format(text, user.getUsername(), confirmLink));
         }
