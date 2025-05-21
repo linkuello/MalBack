@@ -32,7 +32,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendPasswordResetLink(String email, String token) {
-        String link = "https://malsat.kg/reset-password?token=" + token;
+        String link = "https://malsat.onrender.com/reset-password?token=" + token;
         String subject = "MalSat.kg - Password Reset";
         String body = "To reset your password, click the link below:\n\n" +
                 link + "\n\nThis link will expire in 15 minutes.";
